@@ -220,10 +220,11 @@ def _load_with_fabio(file: Path) -> Tuple[np.ndarray, Dict[str, Any]]:
 # --- Public API ---
 
 def load_image_with_info(
-    file: Path, h5_path: str = DEFAULT_H5_PATH
+    file: Path, h5_path: str = DEFAULT_H5_PATH, frame_index: int = 0, channel: int = 0
 ) -> Dict[str, Any]:
     """Load image data and return dict with 'data' and 'metadata'."""
     from .edf_io import read_edf
+    from .stacked_hdf5 import finite_nframes, read_frame as read_hdf5_frame
 
     kind = sniff_file_kind(file)
     metadata: Dict[str, Any] = {
@@ -242,7 +243,9 @@ def load_image_with_info(
     elif kind == 'edf':
         arr = read_edf(file)
     elif kind == 'hdf5':
-        arr = _load_hdf5_dataset(file, h5_path)
+        nframes = finite_nframes(file, dataset=h5_path.lstrip("/") if h5_path else "entry/data/data")
+        metadata["nframes"] = nframes
+        arr = read_hdf5_frame(file, int(frame_index), channel=int(channel), dataset=h5_path.lstrip("/") if h5_path else "entry/data/data")
     elif kind == 'cbf':
         arr, fabio_meta = _load_with_fabio(file)
         metadata.update(fabio_meta)
@@ -261,9 +264,9 @@ def load_image_with_info(
     return {"data": arr, "metadata": metadata}
 
 
-def load_image(file: Path, h5_path: str = DEFAULT_H5_PATH):
+def load_image(file: Path, h5_path: str = DEFAULT_H5_PATH, frame_index: int = 0, channel: int = 0):
     """Load image data, returning just the numpy array."""
-    return load_image_with_info(file, h5_path)["data"]
+    return load_image_with_info(file, h5_path, frame_index=frame_index, channel=channel)["data"]
 
 
 # --- File discovery ---
