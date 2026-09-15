@@ -23,22 +23,23 @@ except Exception:
 
 
 class DetectorIORoundTripTests(unittest.TestCase):
-    def test_public_hdf5_loader_rejects_multi_frame_stack(self):
+    def test_public_hdf5_loader_reads_selected_frame_from_stack(self):
         try:
             import h5py
         except Exception:
             self.skipTest("h5py is not installed")
 
+        source = np.arange(24, dtype=np.float32).reshape(2, 3, 4)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "multi-frame.h5"
             with h5py.File(path, "w") as handle:
-                handle.create_dataset(
-                    "/entry/data/data",
-                    data=np.arange(24, dtype=np.float32).reshape(2, 3, 4),
-                )
+                handle.create_dataset("/entry/data/data", data=source)
 
-            with self.assertRaisesRegex(ValueError, "单个 2D"):
-                load_image_with_info(path)
+            loaded = load_image_with_info(path, frame_index=1)
+
+        self.assertEqual(loaded["data"].shape, (3, 4))
+        self.assertTrue(np.array_equal(loaded["data"], source[1]))
+        self.assertEqual(loaded["metadata"]["nframes"], 2)
 
     def test_npy_float_export_preserves_nonfinite_values_after_processing_cast(self):
         arr = np.array(
