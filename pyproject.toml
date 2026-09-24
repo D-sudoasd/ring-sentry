@@ -62,9 +62,9 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/D-sudoasd/ringsentry"
-Repository = "https://github.com/D-sudoasd/ringsentry"
-Issues = "https://github.com/D-sudoasd/ringsentry/issues"
+Homepage = "https://github.com/D-sudoasd/ring-sentry"
+Repository = "https://github.com/D-sudoasd/ring-sentry"
+Issues = "https://github.com/D-sudoasd/ring-sentry/issues"
 DOI = "https://doi.org/10.5281/zenodo.19602728"
 
 [project.gui-scripts]

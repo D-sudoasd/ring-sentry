@@ -7,8 +7,8 @@ authors:
     family-names: "Gong"
     affiliation: "Institute of Metal Research, Chinese Academy of Sciences, Shenyang, People's Republic of China"
     orcid: "https://orcid.org/0000-0001-7877-7707"
-repository-code: "https://github.com/D-sudoasd/ringsentry"
-url: "https://github.com/D-sudoasd/ringsentry"
+repository-code: "https://github.com/D-sudoasd/ring-sentry"
+url: "https://github.com/D-sudoasd/ring-sentry"
 identifiers:
   - description: "Concept DOI for all archived versions of the software."
     type: doi

@@ -286,4 +286,4 @@ def test_built_distributions_separate_review_sources_from_runtime():
     assert "Classifier: Programming Language :: Python :: 3.13" in metadata
     assert "License: MIT" in metadata
     assert "License-Expression:" not in metadata
-    assert "https://github.com/D-sudoasd/ringsentry#readme" in metadata
+    assert "https://github.com/D-sudoasd/ring-sentry#readme" in metadata

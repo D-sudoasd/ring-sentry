@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="assets/readme/hero.svg" width="100%" alt="RingSentry: reproducible preprocessing and QC for 2D diffraction images.">
+  <img src="assets/readme/hero.svg" width="100%" alt="RingSentry 衍环前哨：二维衍射图预处理与质控工具。">
 </p>
 
 <div align="center">
 
-# RingSentry
+# RingSentry｜衍环前哨——二维衍射图预处理与质控工具
 
 **Reproducible preprocessing and quality control for 2D diffraction detector images**
 
@@ -204,7 +204,7 @@ once the version used in the analysis has been released.
 
 ## Support and governance
 
-Use [GitHub Issues](https://github.com/D-sudoasd/ringsentry/issues) for
+Use [GitHub Issues](https://github.com/D-sudoasd/ring-sentry/issues) for
 reproducible bugs, focused feature proposals, and general usage questions.
 Follow [`SECURITY.md`](SECURITY.md) for vulnerabilities and avoid uploading
 private beamline data. RingSentry is currently maintained as a single-maintainer
