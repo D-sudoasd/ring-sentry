@@ -12,7 +12,7 @@ requires-python = ">=3.8"
 # require Python >=3.9. Keep the legacy table while Python 3.8 remains supported.
 license = { text = "MIT" }
 authors = [
-    { name = "Delun Gong" },
+    { name = "Delun Gong", email = "dlgong17s@imr.ac.cn" },
 ]
 keywords = [
     "2D diffraction",
@@ -56,6 +56,7 @@ test = [
     "build>=1.2",
     "cffconvert>=2.0",
     "pytest>=7",
+    "PyYAML>=6",
     "ruff>=0.5",
     "setuptools>=61.0",
     "tomli>=2.0; python_version < '3.11'",
