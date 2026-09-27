@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/readme/hero.svg" width="100%" alt="RingSentry 衍环前哨：二维衍射图预处理与质控工具。">
+  <img src="assets/readme/hero.png" width="100%" alt="RingSentry: Reproducible diffraction-image preprocessing. AI-generated conceptual illustration.">
 </p>
 
 <div align="center">
@@ -115,6 +115,8 @@ clipping → negative clipping → hot-pixel suppression → rotation/flips →
 binning → intensity transform → gamma → normalization.
 
 ## Reproducible headless example
+
+<p align="center"><img src="paper/figures/synthetic_processing.png" width="100%" alt="Seeded synthetic detector input and processing output, reproduced by RingSentry."></p>
 
 This example generates its own deterministic synthetic ring image. It is not
 an experimental result or a performance benchmark.

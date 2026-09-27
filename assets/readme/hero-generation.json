@@ -1,0 +1,12 @@
+{
+  "name": "RingSentry",
+  "subtitle": "Reproducible diffraction-image preprocessing",
+  "palette": "Deep midnight navy, luminous cyan, restrained warm amber",
+  "motif": "A precise flat detector plane with concentric powder-diffraction rings, a delicately visible pixel matrix, and a second refined detector plane linked by a simple short processing path. Keep rings circular on the plane; this is a conceptual motif, no measurements.",
+  "tool": "image_gen built-in; model identifier not exposed",
+  "revision": null,
+  "prompt": "Create one exceptionally polished scientific software README cover banner, wide landscape approximately 2.4:1 aspect ratio, premium editorial art direction, high resolution. Project: RingSentry. Palette: Deep midnight navy, luminous cyan, restrained warm amber. Concept: A precise flat detector plane with concentric powder-diffraction rings, a delicately visible pixel matrix, and a second refined detector plane linked by a simple short processing path. Keep rings circular on the plane; this is a conceptual motif, no measurements. Compose generous negative space and sharply legible refined sans-serif typography integrated with the scientific motif. Exact text, no other copy: \"RingSentry\" large, \"Reproducible diffraction-image preprocessing\" smaller, and a discreet \"Conceptual illustration\". Make name/subtitle read immediately at GitHub width. Restrained three-dimensional material, carefully controlled highlights, precise linework, sophisticated hierarchy and balanced composition. No generic AI neon clouds, no random particles, no badges, no claims, no photoreal experimental data, no fake application screenshot, no watermarks or publisher branding. This is an editorial cover, not a quantitative paper figure.",
+  "created_on": "2026-09-27",
+  "purpose": "README conceptual cover only, not experimental data or software output",
+  "sha256": "e44ca17190194571e85abe4dfa48d096ad2ca2dbed02abed8e5d22b67c7defa9"
+}

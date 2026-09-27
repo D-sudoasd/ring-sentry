@@ -13,7 +13,7 @@ include START_RingSentry.bat
 include START_RingSentry.cmd
 include 双击启动_RingSentry.cmd
 
-recursive-include assets/readme *.svg
+recursive-include assets/readme *.svg *.png *.json
 include docs/CORE_API.md
 include docs/USER_GUIDE.md
 include docs/ZENODO_DOI_PLAN.md

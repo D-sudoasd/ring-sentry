@@ -41,7 +41,7 @@ The application separates the `tkinter` interface from numerical and I/O modules
 
 The processing function converts an input to a two-dimensional `float32` array and applies enabled operations in a documented order: dark subtraction, flat correction, background subtraction, region-of-interest cropping, masking, absolute and percentile limits, negative clipping, local median/MAD hot-pixel suppression, right-angle rotations and flips, block-mean binning, intensity transform, gamma, and normalization. Flat correction expects a relative detector-response map; RingSentry does not normalize raw flat counts automatically. Invalid flat denominators and masked pixels become non-finite values within the pipeline. Writers for compatible floating-point formats preserve these values. CSV and DAT matrices replace non-finite values with zero and add category counts to batch records; external software may render non-finite TIFF values inconsistently. PNG generation follows a distinct fixed-range display path.
 
-![RingSentry architecture. Top: the batch path from GUI inputs through detector I/O, non-mutating QC, fixed-order numerical processing, and format-aware output. Centre: the numerical operation order. Bottom: the independent CBF exceptional-value and ideal planar Q tools.](figures/architecture_workflow.png)
+![RingSentry workflow. (a) the batch path from GUI inputs through detector I/O, non-mutating QC, fixed-order numerical processing, and format-aware output. (b) The numerical operation order. (c) the independent CBF exceptional-value and ideal planar Q tools.](figures/architecture_workflow.png)
 
 Core behavior is testable without opening the GUI. The test suite covers numerical processing, QC, diffraction geometry, EDF and FabIO interoperability, output semantics, CBF replacement safeguards, interface error handling, metadata consistency, and the end-to-end synthetic example. The example generates two analytic rings with seeded noise, processes the array, and saves quantitative NPY data, a display PNG, and a machine-readable summary.
 
@@ -61,6 +61,8 @@ RingSentry is distributed under the MIT License from [GitHub](https://github.com
 # AI usage disclosure
 
 OpenAI Codex assisted earlier repository inspection, requirements and literature organization, tests, documentation, figures and manuscript preparation in July and August 2026. The exact hosted model version for that earlier work was not retained. In September 2026, OpenAI Codex (GPT-6) assisted submission preparation, metadata alignment, research-use documentation and automated verification. The author must review and confirm the complete disclosure and all new AI-assisted outputs before submission.
+
+The README cover is AI-generated conceptual artwork. Manuscript diagrams and numerical plots are produced by repository scripts; scientific data are not retouched by an image-generation model.
 
 # Acknowledgements
 

@@ -1,29 +1,125 @@
-"""Generate the two repository-owned figures used by the JOSS manuscript.
-
-The script uses only RingSentry source code and a deterministic synthetic
-array.  It does not load experimental data or report performance results.
-"""
-
-from __future__ import annotations
+"""Reproducible publication graphics; no experimental measurements are synthesized."""
 
 import argparse
-import sys
+import numpy as np
 from pathlib import Path
-from typing import Dict, Iterable, Optional, Sequence, Tuple
-
+import sys
 import matplotlib
 
-matplotlib.use("Agg", force=True)
-
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
-import numpy as np
+from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+
+INK = "#142C3D"
+MUTED = "#516570"
+RULE = "#CCD7DC"
+ACCENT = "#087F8C"
+LIGHT = "#EFF7F8"
+WARM = "#B86B20"
 
 
-REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-if str(REPOSITORY_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPOSITORY_ROOT))
+def style():
+    matplotlib.rcParams.update(
+        {
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "DejaVu Sans"],
+            "font.size": 10,
+            "axes.labelsize": 10,
+            "axes.titlesize": 11,
+            "xtick.labelsize": 9,
+            "ytick.labelsize": 9,
+            "text.color": INK,
+            "axes.labelcolor": INK,
+            "axes.edgecolor": RULE,
+            "axes.linewidth": 0.7,
+            "lines.linewidth": 1.5,
+            "svg.fonttype": "none",
+            "svg.hashsalt": "publication-20260927",
+            "pdf.fonttype": 42,
+            "savefig.facecolor": "white",
+        }
+    )
 
+
+def canvas(height=4.6):
+    fig = plt.figure(figsize=(7.2, height), facecolor="white")
+    ax = fig.add_axes([0, 0, 1, 1], xlim=(0, 1), ylim=(0, 1))
+    ax.axis("off")
+    return fig, ax
+
+
+def label(ax, x, y, text, size=10, weight="normal", color=INK, ha="left", va="center"):
+    return ax.text(
+        x, y, text, fontsize=size, fontweight=weight, color=color, ha=ha, va=va, linespacing=1.45
+    )
+
+
+def panel(ax, x, y, letter, title):
+    label(ax, x, y, letter, 12, "bold", ACCENT)
+    label(ax, x + 0.038, y, title, 11, "bold")
+
+
+def box(ax, x, y, w, h, title, body="", accent=ACCENT, face=LIGHT, size=9.5):
+    ax.add_patch(
+        FancyBboxPatch(
+            (x, y),
+            w,
+            h,
+            boxstyle="round,pad=0,rounding_size=0.012",
+            linewidth=0.7,
+            edgecolor=RULE,
+            facecolor=face,
+        )
+    )
+    ax.plot(
+        [x + 0.015, x + 0.015],
+        [y + 0.02, y + h - 0.02],
+        color=accent,
+        lw=2.1,
+        solid_capstyle="round",
+    )
+    label(ax, x + 0.034, y + h - 0.037, title, 10, "bold", accent, va="top")
+    if body:
+        label(ax, x + 0.034, y + h - 0.099, body, size, va="top")
+
+
+def arrow(ax, a, b, color=MUTED, style="-"):
+    ax.add_patch(
+        FancyArrowPatch(
+            a,
+            b,
+            arrowstyle="-|>",
+            mutation_scale=10,
+            linewidth=1,
+            color=color,
+            linestyle=style,
+            shrinkA=2,
+            shrinkB=2,
+        )
+    )
+
+
+def save(fig, folder, stem, formats=("png", "svg", "pdf")):
+    folder.mkdir(parents=True, exist_ok=True)
+    for ext in formats:
+        meta = (
+            {"Date": None}
+            if ext == "svg"
+            else ({"CreationDate": None, "ModDate": None} if ext == "pdf" else {})
+        )
+        fig.savefig(folder / f"{stem}.{ext}", dpi=450, metadata=meta)
+    plt.close(fig)
+
+
+def clean_axes(ax):
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.tick_params(length=3, width=0.6, color=RULE)
+    ax.grid(axis="y", color=RULE, linewidth=0.5, alpha=0.6)
+    ax.set_axisbelow(True)
+
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 from core.processing import apply_processing
 from core.quality import analyze_image_quality
 from examples.minimal_preprocessing import (
@@ -33,397 +129,101 @@ from examples.minimal_preprocessing import (
 )
 
 
-FIGURE_STEMS = ("architecture_workflow", "synthetic_processing")
-SUPPORTED_FORMATS = ("svg", "png", "pdf")
-
-COLORS = {
-    "blue": "#0072B2",
-    "sky": "#56B4E9",
-    "green": "#009E73",
-    "orange": "#E69F00",
-    "vermillion": "#D55E00",
-    "ink": "#202124",
-    "gray": "#666666",
-    "light_blue": "#E8F3F8",
-    "light_green": "#E8F5F0",
-    "light_orange": "#FFF3DC",
-    "light_gray": "#F5F5F5",
-    "white": "#FFFFFF",
-}
-
-
-def configure_style() -> None:
-    """Apply one accessible publication style to both figures."""
-    matplotlib.rcParams.update(
-        {
-            "font.family": "sans-serif",
-            "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
-            # The manuscript scales these 180 mm figures down slightly.  Keep
-            # the source text at or above 8 pt so the final PDF remains legible.
-            "font.size": 8.4,
-            "axes.titlesize": 8.8,
-            "axes.labelsize": 8.4,
-            "xtick.labelsize": 8.4,
-            "ytick.labelsize": 8.4,
-            "legend.fontsize": 8.4,
-            "figure.titlesize": 9.6,
-            "axes.linewidth": 0.6,
-            "lines.linewidth": 1.0,
-            "savefig.dpi": 600,
-            "svg.fonttype": "none",
-            "svg.hashsalt": "ringsentry-joss-figures",
-            "pdf.fonttype": 42,
-            "ps.fonttype": 42,
-        }
-    )
-
-
-def _add_stage_box(
-    ax,
-    x: float,
-    y: float,
-    width: float,
-    height: float,
-    number: str,
-    title: str,
-    body: str,
-    facecolor: str,
-    edgecolor: str,
-) -> None:
-    patch = FancyBboxPatch(
-        (x, y),
-        width,
-        height,
-        boxstyle="round,pad=0.008,rounding_size=0.012",
-        facecolor=facecolor,
-        edgecolor=edgecolor,
-        linewidth=0.8,
-    )
-    ax.add_patch(patch)
-    ax.text(
-        x + 0.012,
-        y + height - 0.020,
-        f"{number}  {title}",
-        ha="left",
-        va="top",
-        fontsize=8.6,
-        fontweight="bold",
-        color=COLORS["ink"],
-    )
-    ax.text(
-        x + width / 2.0,
-        y + height - 0.063,
-        body,
-        ha="center",
-        va="top",
-        fontsize=8.4,
-        linespacing=1.25,
-        color=COLORS["ink"],
-    )
-
-
-def _add_arrow(ax, start: Tuple[float, float], end: Tuple[float, float]) -> None:
-    arrow = FancyArrowPatch(
-        start,
-        end,
-        arrowstyle="-|>",
-        mutation_scale=8,
-        linewidth=0.8,
-        color=COLORS["ink"],
-        shrinkA=2,
-        shrinkB=2,
-    )
-    ax.add_patch(arrow)
-
-
-def _add_independent_tool(
-    ax,
-    x: float,
-    y: float,
-    width: float,
-    height: float,
-    title: str,
-    module: str,
-    body: str,
-    caution: str,
-    edgecolor: str,
-) -> None:
-    patch = FancyBboxPatch(
-        (x, y),
-        width,
-        height,
-        boxstyle="round,pad=0.010,rounding_size=0.012",
-        facecolor=COLORS["white"],
-        edgecolor=edgecolor,
-        linewidth=0.8,
-        linestyle=(0, (5, 2.5)),
-    )
-    ax.add_patch(patch)
-    ax.text(
-        x + 0.016,
-        y + height - 0.018,
-        title,
-        ha="left",
-        va="top",
-        fontsize=8.6,
-        fontweight="bold",
-        color=edgecolor,
-    )
-    ax.text(
-        x + 0.016,
-        y + height - 0.052,
-        module,
-        ha="left",
-        va="top",
-        fontsize=8.4,
-        color=COLORS["gray"],
-    )
-    ax.text(
-        x + 0.016,
-        y + height - 0.082,
-        body,
-        ha="left",
-        va="top",
-        fontsize=8.4,
-        linespacing=1.25,
-        color=COLORS["ink"],
-    )
-    ax.text(
-        x + 0.016,
-        y + 0.014,
-        caution,
-        ha="left",
-        va="bottom",
-        fontsize=8.4,
-        fontweight="bold",
-        color=COLORS["ink"],
-    )
-
-
 def create_architecture_workflow():
-    """Create the verified RingSentry architecture and workflow diagram."""
-    # 7.1 in = 180.3 mm, kept below Nature's 183 mm two-column width.
-    fig, ax = plt.subplots(figsize=(7.1, 5.6))
-    ax.set_xlim(0.0, 1.0)
-    ax.set_ylim(0.0, 1.0)
-    ax.axis("off")
-
-    ax.text(
-        0.5,
-        0.970,
-        "RingSentry architecture and auditable processing workflow",
-        ha="center",
-        va="top",
-        fontsize=9.6,
-        fontweight="bold",
-        color=COLORS["ink"],
-    )
-    ax.text(
-        0.025,
-        0.910,
-        "Main batch path (GUI-orchestrated; per-file core data path)",
-        ha="left",
-        va="center",
-        fontsize=8.4,
-        color=COLORS["gray"],
-    )
-
-    y = 0.685
-    height = 0.170
-    stage_specs = (
-        (
-            0.025,
-            0.150,
-            "1",
-            "Entry / GUI",
-            "main.py → App\nexplicit\nparameters",
-            COLORS["light_blue"],
-            COLORS["blue"],
-        ),
-        (
-            0.189,
-            0.174,
-            "2",
-            "Discover / load",
-            "core.loader\nfiles → 2D arrays",
-            COLORS["light_blue"],
-            COLORS["blue"],
-        ),
-        (
-            0.377,
-            0.180,
-            "3",
-            "QC / preflight",
-            "core.quality\nread-only QC / plan",
-            COLORS["light_green"],
-            COLORS["green"],
-        ),
-        (
-            0.571,
-            0.214,
-            "4",
-            "Processing",
-            "core.worker\n→ apply_processing",
-            COLORS["light_orange"],
-            COLORS["orange"],
-        ),
-        (
-            0.799,
-            0.176,
-            "5",
-            "Write / report",
-            "core.writer\n+ gui.app report",
-            COLORS["light_blue"],
-            COLORS["blue"],
-        ),
-    )
-    for x, width, number, title, body, face, edge in stage_specs:
-        _add_stage_box(ax, x, y, width, height, number, title, body, face, edge)
-
-    for left, right in (
-        (0.175, 0.189),
-        (0.363, 0.377),
-        (0.557, 0.571),
-        (0.785, 0.799),
-    ):
-        _add_arrow(ax, (left, y + height / 2.0), (right, y + height / 2.0))
-
-    process_box = FancyBboxPatch(
-        (0.025, 0.365),
-        0.950,
-        0.225,
-        boxstyle="round,pad=0.010,rounding_size=0.012",
-        facecolor=COLORS["light_gray"],
-        edgecolor=COLORS["orange"],
-        linewidth=0.75,
-    )
-    ax.add_patch(process_box)
-    ax.text(
-        0.045,
-        0.565,
-        "apply_processing: fixed, explicit operation order",
-        ha="left",
-        va="top",
-        fontsize=8.6,
-        fontweight="bold",
-        color=COLORS["ink"],
-    )
-    ordered_lines = (
-        "1 Dark subtraction  →  2 Flat correction  →  3 Background offset  →  "
-        "4 Validate clipping parameters",
-        "5 ROI  →  6 Mask  →  7 Absolute clipping  →  8 Percentile clipping",
-        "9 Negative clipping  →  10 Hot-pixel suppression  →  11 Rotate / flip  →  "
-        "12 Block-mean binning",
-        "13 Intensity transform  →  14 Gamma  →  15 Normalization",
-    )
-    for index, line in enumerate(ordered_lines):
-        ax.text(
-            0.500,
-            0.510 - index * 0.041,
-            line,
-            ha="center",
-            va="center",
-            fontsize=8.4,
-            color=COLORS["ink"],
-        )
-    _add_arrow(ax, (0.680, 0.685), (0.680, 0.600))
-
-    ax.text(
-        0.5,
-        0.335,
-        "Independent tools (separate GUI tabs and core modules; not batch stages)",
-        ha="center",
-        va="center",
-        fontsize=8.4,
-        fontweight="bold",
-        color=COLORS["gray"],
-    )
-    _add_independent_tool(
+    fig, ax = canvas(5.5)
+    panel(ax, 0.035, 0.95, "a", "Batch workflow")
+    names = [
+        ("01  Configure", "GUI settings"),
+        ("02  Load", "Detector arrays"),
+        ("03  Inspect", "Read-only QC"),
+        ("04  Process", "Ordered steps"),
+        ("05  Export", "Data + reports"),
+    ]
+    for i, (title, body) in enumerate(names):
+        x = 0.035 + i * 0.192
+        box(ax, x, 0.75, 0.165, 0.135, title, body, size=8.8)
+        if i < 4:
+            arrow(ax, (x + 0.165, 0.814), (x + 0.192, 0.814))
+    panel(ax, 0.035, 0.68, "b", "Fixed numerical operation order")
+    operations = [
+        "Dark subtraction",
+        "Flat correction",
+        "Background offset",
+        "Validate clipping",
+        "Region of interest",
+        "Mask",
+        "Absolute clipping",
+        "Percentile clipping",
+        "Negative clipping",
+        "Hot-pixel suppression",
+        "Rotate / flip",
+        "Block-mean binning",
+        "Intensity transform",
+        "Gamma",
+        "Normalization",
+    ]
+    for i, t in enumerate(operations):
+        col, row = divmod(i, 5)
+        x = 0.048 + col * 0.32
+        y = 0.608 - row * 0.053
+        label(ax, x, y, f"{i + 1:02d}", 9, "bold", ACCENT)
+        label(ax, x + 0.049, y, t, 9.2)
+    panel(ax, 0.035, 0.30, "c", "Independent tools")
+    box(
         ax,
-        0.025,
-        0.055,
-        0.455,
-        0.245,
-        "Independent: CBF zero-value repair",
-        "core.overexposure_repair",
-        "Scan → target mask → write / read-back\n"
-        "→ verify → CSV / configuration / QC reports",
-        "Configured zeros only; cannot recover\ntrue saturated intensity.",
-        COLORS["vermillion"],
+        0.035,
+        0.068,
+        0.448,
+        0.177,
+        "CBF zero-value repair",
+        "Target mask → write → verify\nConfigured zeros; not saturation recovery",
+        accent=WARM,
+        face="#FCF6EF",
+        size=8.8,
     )
-    _add_independent_tool(
+    box(
         ax,
-        0.520,
-        0.055,
-        0.455,
-        0.245,
-        "Independent: Q geometry calculator",
-        "core.diffraction_model",
-        "User λ / distance / pixel size /\n"
-        "beam center → ideal-planar Q / 2θ / r / d\n"
-        "+ detector view / export",
-        "No image calibration, integration, peak fitting,\nor refinement.",
-        COLORS["green"],
+        0.515,
+        0.068,
+        0.448,
+        0.177,
+        "Ideal planar geometry",
+        "Wavelength + detector geometry\nQ, 2θ, radius and d-spacing conversion",
+        size=8.8,
     )
-    ax.text(
-        0.5,
-        0.008,
-        "Scope: inspectable preprocessing, quality control, geometry conversion, "
-        "and export of 2D detector images.",
-        ha="center",
-        va="bottom",
-        fontsize=8.4,
-        color=COLORS["gray"],
+    label(
+        ax,
+        0.035,
+        0.025,
+        "Preprocessing and QC precede downstream integration or fitting.",
+        8.8,
+        color=MUTED,
     )
     return fig
 
 
-def _radial_mean(
-    arr: np.ndarray, radius_scale: float = 1.0
-) -> Tuple[np.ndarray, np.ndarray]:
-    data = np.asarray(arr, dtype=np.float64)
-    yy, xx = np.indices(data.shape, dtype=np.float64)
-    center_x = (data.shape[1] - 1) / 2.0
-    center_y = (data.shape[0] - 1) / 2.0
-    radius = np.hypot(xx - center_x, yy - center_y) * float(radius_scale)
-    radius_bin = np.floor(radius).astype(np.int64)
+def _radial_mean(arr, radius_scale=1.0):
+    data = np.asarray(arr, dtype=float)
+    yy, xx = np.indices(data.shape, dtype=float)
+    r = np.floor(
+        np.hypot(xx - (data.shape[1] - 1) / 2, yy - (data.shape[0] - 1) / 2) * radius_scale
+    ).astype(int)
     finite = np.isfinite(data)
-    sums = np.bincount(radius_bin[finite], weights=data[finite])
-    counts = np.bincount(radius_bin[finite])
-    valid = counts > 0
-    means = np.full(counts.shape, np.nan, dtype=np.float64)
-    means[valid] = sums[valid] / counts[valid]
-    return np.arange(means.size, dtype=np.float64) + 0.5, means
+    sums = np.bincount(r[finite], weights=data[finite])
+    counts = np.bincount(r[finite])
+    means = np.full(counts.shape, np.nan)
+    means[counts > 0] = sums[counts > 0] / counts[counts > 0]
+    return np.arange(len(means)) + 0.5, means
 
 
-def _display_normalize(values: np.ndarray) -> np.ndarray:
-    values = np.asarray(values, dtype=np.float64)
-    finite = np.isfinite(values)
-    result = np.full(values.shape, np.nan, dtype=np.float64)
-    if not np.any(finite):
-        return result
-    vmin = float(np.min(values[finite]))
-    vmax = float(np.max(values[finite]))
-    if vmax > vmin:
-        result[finite] = (values[finite] - vmin) / (vmax - vmin)
-    else:
-        result[finite] = 0.0
-    return result
-
-
-def _array_fact_line(label: str, arr: np.ndarray) -> str:
-    finite_count = int(np.count_nonzero(np.isfinite(arr)))
-    return (
-        f"{label}: {arr.shape[0]} × {arr.shape[1]}, {arr.dtype}, "
-        f"finite {finite_count:,}/{arr.size:,}"
-    )
+def _display_normalize(a):
+    return (a - np.nanmin(a)) / (np.nanmax(a) - np.nanmin(a))
 
 
 def create_synthetic_processing():
-    """Create a no-real-data demonstration using the shipped example seam."""
     raw = generate_synthetic_detector_image()
     processed = apply_processing(raw, **PROCESSING_OPTIONS)
-    quality = analyze_image_quality(
+    qc = analyze_image_quality(
         raw,
         metadata={
             "source_kind": "synthetic",
@@ -432,222 +232,68 @@ def create_synthetic_processing():
         },
         source_name="synthetic_diffraction_rings",
     )
-
-    fig = plt.figure(figsize=(7.1, 5.2), constrained_layout=False)
-    grid = fig.add_gridspec(
-        1,
-        3,
-        left=0.070,
-        right=0.980,
-        bottom=0.360,
-        top=0.795,
-        wspace=0.48,
-        width_ratios=(1.0, 1.0, 1.35),
-    )
-    raw_ax = fig.add_subplot(grid[0, 0])
-    processed_ax = fig.add_subplot(grid[0, 1])
-    profile_ax = fig.add_subplot(grid[0, 2])
-
-    fig.text(
-        0.5,
-        0.950,
-        "Deterministic synthetic preprocessing example",
-        ha="center",
-        va="top",
-        fontsize=9.6,
-        fontweight="bold",
-        color=COLORS["ink"],
-    )
-    fig.text(
-        0.5,
-        0.875,
-        "Fixed-seed synthetic image and settings from the shipped minimal "
-        "preprocessing example; processed by the RingSentry core",
-        ha="center",
-        va="center",
-        fontsize=8.4,
-        color=COLORS["gray"],
-    )
-
-    raw_image = raw_ax.imshow(raw, origin="upper", cmap="cividis", interpolation="nearest")
-    raw_ax.set_title("Raw synthetic matrix", pad=5)
-    raw_ax.set_xlabel("Detector x (pixels)")
-    raw_ax.set_ylabel("Detector y (pixels)")
-    raw_colorbar = fig.colorbar(
-        raw_image,
-        ax=raw_ax,
-        orientation="horizontal",
-        fraction=0.060,
-        pad=0.175,
-        aspect=28,
-    )
-    raw_colorbar.set_label("Synthetic intensity (a.u.)", fontsize=8.4, labelpad=2)
-    raw_colorbar.ax.tick_params(labelsize=8.4, width=0.5, length=2.0)
-
-    processed_image = processed_ax.imshow(
-        processed,
-        origin="upper",
-        cmap="cividis",
-        interpolation="nearest",
-        vmin=0.0,
-        vmax=1.0,
-    )
-    processed_ax.set_title("Processed matrix", pad=5)
-    processed_ax.set_xlabel("Output x (pixels)")
-    processed_ax.set_ylabel("Output y (pixels)")
-    processed_colorbar = fig.colorbar(
-        processed_image,
-        ax=processed_ax,
-        orientation="horizontal",
-        fraction=0.060,
-        pad=0.175,
-        aspect=28,
-    )
-    processed_colorbar.set_label("Normalized value", fontsize=8.4, labelpad=2)
-    processed_colorbar.ax.tick_params(labelsize=8.4, width=0.5, length=2.0)
-
-    raw_radius, raw_profile = _radial_mean(raw)
-    scale = float(PROCESSING_OPTIONS.get("bin_factor", 1))
-    processed_radius, processed_profile = _radial_mean(
-        processed, radius_scale=scale
-    )
-    profile_ax.plot(
-        raw_radius,
-        _display_normalize(raw_profile),
-        color=COLORS["blue"],
-        linestyle="-",
-        marker="o",
-        markevery=8,
-        markersize=2.8,
-        label="Raw synthetic",
-    )
-    profile_ax.plot(
-        processed_radius,
-        _display_normalize(processed_profile),
-        color=COLORS["orange"],
-        linestyle="--",
-        marker="s",
-        markevery=7,
-        markersize=2.7,
-        label="Processed",
-    )
-    profile_ax.set_title("Radial mean (display-normalized)", pad=5)
-    profile_ax.set_xlabel("Radius (input-pixel equivalent)")
-    profile_ax.set_ylabel("Separately normalized mean (a.u.)")
-    profile_ax.set_ylim(-0.04, 1.08)
-    profile_ax.grid(axis="y", color="#D0D0D0", linewidth=0.5, linestyle=":")
-    profile_ax.spines["top"].set_visible(False)
-    profile_ax.spines["right"].set_visible(False)
-    profile_ax.legend(loc="upper right", frameon=False, handlelength=2.6)
-    for label, axis in zip(("a", "b", "c"), (raw_ax, processed_ax, profile_ax)):
-        axis.text(
-            -0.16,
-            1.10,
-            label,
-            transform=axis.transAxes,
-            ha="left",
-            va="top",
-            fontsize=10.0,
-            fontweight="bold",
-            color=COLORS["ink"],
+    assert np.isfinite(raw).all() and np.isfinite(processed).all()
+    assert qc is not None
+    fig = plt.figure(figsize=(7.2, 5.7))
+    a = fig.add_axes([0.10, 0.52, 0.31, 0.38])
+    b = fig.add_axes([0.59, 0.52, 0.31, 0.38])
+    for ax, arr, title, xlab, unit in [
+        (a, raw, "a   Raw synthetic image", "Detector", "Intensity (a.u.)"),
+        (b, processed, "b   Processed image", "Output", "Normalized value"),
+    ]:
+        im = ax.imshow(arr, cmap="cividis", origin="upper", interpolation="nearest")
+        ax.set_title(title, loc="left", fontweight="bold", pad=12)
+        ax.set_xlabel(f"{xlab} x (pixels)")
+        ax.set_ylabel(f"{xlab} y (pixels)")
+        cb = fig.colorbar(im, ax=ax, fraction=0.047, pad=0.025)
+        cb.set_label(unit, fontsize=9)
+        cb.ax.tick_params(labelsize=8, length=2)
+    c = fig.add_axes([0.10, 0.12, 0.8, 0.245])
+    for arr, scale, color, ls, mark, title in [
+        (raw, 1.0, ACCENT, "-", "o", "Raw"),
+        (processed, float(PROCESSING_OPTIONS.get("bin_factor", 1)), WARM, "--", "s", "Processed"),
+    ]:
+        r, p = _radial_mean(arr, scale)
+        c.plot(
+            r,
+            _display_normalize(p),
+            color=color,
+            ls=ls,
+            marker=mark,
+            markevery=9,
+            ms=3,
+            label=title,
         )
-
-    findings = ", ".join(item.category for item in quality.findings) or "none"
-    processing_text = (
-        "Processing: background offset 35 → percentile clipping 0.5–99.5 →\n"
-        "negative clipping → "
-        "2 × block mean → log1p → min–max normalization"
+    c.set_title(
+        "c   Radial means · independently normalized for display",
+        loc="left",
+        fontweight="bold",
+        pad=9,
     )
-    fact_text = (
-        f"Seed: {SYNTHETIC_SEED}   |   Shipped example: examples/minimal_preprocessing.py\n"
-        f"{_array_fact_line('Raw', raw)}\n"
-        f"{_array_fact_line('Processed', processed)}\n"
-        f"QC findings: {findings}; review_required={str(quality.review_required).lower()}\n"
-        f"{processing_text}"
-    )
+    c.set(xlabel="Radius (input-pixel equivalent)", ylabel="Scaled intensity", ylim=(-0.04, 1.1))
+    c.legend(frameon=False, loc="upper right", ncol=2, fontsize=9)
+    clean_axes(c)
     fig.text(
-        0.055,
-        0.055,
-        fact_text,
-        ha="left",
-        va="bottom",
-        fontsize=8.4,
-        linespacing=1.35,
-        color=COLORS["ink"],
-        bbox={
-            "boxstyle": "round,pad=0.32",
-            "facecolor": COLORS["light_gray"],
-            "edgecolor": "#B8B8B8",
-            "linewidth": 0.7,
-        },
+        0.10,
+        0.025,
+        f"Synthetic example · seed {SYNTHETIC_SEED} · 128 × 128 → 64 × 64 pixels",
+        fontsize=9,
+        color=MUTED,
     )
     return fig
 
 
-def _save_figure(fig, output_dir: Path, stem: str, formats: Iterable[str]) -> None:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    for fmt in formats:
-        output_path = output_dir / f"{stem}.{fmt}"
-        metadata: Optional[Dict[str, object]]
-        if fmt == "svg":
-            metadata = {"Creator": "RingSentry paper/figures/make_figures.py", "Date": None}
-        elif fmt == "pdf":
-            metadata = {
-                "Creator": "RingSentry paper/figures/make_figures.py",
-                "CreationDate": None,
-                "ModDate": None,
-            }
-        else:
-            metadata = {"Software": "RingSentry paper/figures/make_figures.py"}
-        fig.savefig(
-            output_path,
-            format=fmt,
-            dpi=600,
-            metadata=metadata,
-        )
-        print(f"WROTE {output_path.resolve()}")
-
-
-def generate_figures(output_dir: Path, formats: Sequence[str]) -> None:
-    configure_style()
-    creators = (
-        (FIGURE_STEMS[0], create_architecture_workflow),
-        (FIGURE_STEMS[1], create_synthetic_processing),
-    )
-    for stem, creator in creators:
-        figure = creator()
-        try:
-            _save_figure(figure, output_dir, stem, formats)
-        finally:
-            plt.close(figure)
-
-
-def _parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Generate the RingSentry JOSS architecture and synthetic figures."
-    )
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parent)
     parser.add_argument(
-        "--output-dir",
-        type=Path,
-        default=Path(__file__).resolve().parent,
-        help="Destination directory (default: paper/figures).",
+        "--formats", nargs="+", choices=["png", "svg", "pdf"], default=["png", "svg", "pdf"]
     )
-    parser.add_argument(
-        "--formats",
-        nargs="+",
-        choices=SUPPORTED_FORMATS,
-        default=list(SUPPORTED_FORMATS),
-        help="One or more output formats; default: svg, pdf, and png.",
-    )
-    return parser.parse_args(argv)
-
-
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    args = _parse_args(argv)
-    formats = tuple(dict.fromkeys(args.formats))
-    generate_figures(args.output_dir, formats)
-    return 0
+    args = parser.parse_args()
+    style()
+    save(create_architecture_workflow(), args.output_dir, "architecture_workflow", args.formats)
+    save(create_synthetic_processing(), args.output_dir, "synthetic_processing", args.formats)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
