@@ -24,7 +24,22 @@ non-mutating quality-control suggestions, an explicitly ordered numerical
 pipeline, previews, batch reports, a conservative CBF zero-value repair
 workflow, and detector-geometry/Q conversion tools.
 
-二维衍射图预处理：处理顺序、风险提示和参数进入日志与报告，避免静默改变数据含义。
+RingSentry 提供本地桌面界面与 Python 计算核心，用于积分、拟合和织构分析前的
+二维衍射图像预处理。它结合多格式读写、质量检查建议、明确的处理顺序、预览、
+批处理报告、CBF 零值修复与探测器几何工具，并将参数和处理记录随结果保存。
+
+[Install / 安装](#install) · [Quick start / 快速开始](#quick-start) ·
+[中文使用入口](#中文使用入口) · [Documentation / 文档](#documentation)
+
+## 中文使用入口
+
+1. 按下方安装步骤安装项目本身，再运行 `ringsentry`。
+2. 导入探测器图像，检查格式、像素和几何；质量建议不会自动改变处理参数。
+3. 选择处理步骤并检查预览，区分数值处理结果与仅用于显示的图像。
+4. 导出结果、日志和批处理报告，再交给积分或拟合软件。
+
+本工具不执行方位积分、峰拟合或结构精修。原始数据、处理结果与显示导出
+具有不同用途，解释数据时需结合下方的处理约定。
 
 ## Why RingSentry
 
