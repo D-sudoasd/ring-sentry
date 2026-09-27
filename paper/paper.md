@@ -9,12 +9,13 @@ tags:
 authors:
   - name: Delun Gong
     orcid: 0000-0001-7877-7707
+    email: dlgong17s@imr.ac.cn
     affiliation: 1
     corresponding: true
 affiliations:
   - index: 1
-    name: Institute of Metal Research, Chinese Academy of Sciences, Shenyang, People's Republic of China
-date: 12 August 2026
+    name: Institute of Metal Research, Chinese Academy of Sciences, Shenyang 110016, China
+date: 27 September 2026
 bibliography: paper.bib
 ---
 
@@ -50,24 +51,23 @@ The design favors an ordered pipeline over an unconstrained plugin graph, reduci
 
 # Research impact statement
 
-RingSentry records the numerical transformations applied to each detector image and keeps quantitative outputs separate from display products.
+The author reports using RingSentry in the research underlying the Ti-24Nb-4Zr-8Sn study by Gong et al. [@gong2026acta], as confirmed on 27 September 2026. This is an author-confirmed application, not a claim that the article cites the software or that all features in the current candidate were used. The historical revision and operation-to-output mapping remain to be checked against the author's processing records before submission. The repository records this distinction alongside reproducible software-verification examples. Those examples establish specified numerical and software behavior rather than experimental accuracy or independent adoption.
 
-[AUTHOR ACTION REQUIRED: JOSS requires an actual research use. Describe one completed project or analysis workflow, including the data or experimental context, RingSentry's specific role, a traceable output or record, and evidence that can be explained to the editor. A synthetic example, prospective use, or unverified adoption claim is not a substitute.]
 
 # Software availability
 
-RingSentry is distributed from [GitHub](https://github.com/D-sudoasd/ringsentry) under the MIT License. The public `joss-submission` review branch identifies version 7.0.0, while the latest tagged GitHub release and version-specific Zenodo archive remain at v6.0.1 as verified on 15 August 2026. Upon successful completion of review, the authors will create a matching tagged release and archive, then report the version and archive DOI in the review thread. The repository includes installation instructions, a headless synthetic example, core API documentation, contribution guidance, issue templates, and tests.
+RingSentry is distributed under the MIT License from [GitHub](https://github.com/D-sudoasd/ring-sentry). The current source identifies version 7.0.0; the latest published release remains v6.0.1. The candidate is identified by its source commit. An archive of the final reviewed version will be created after successful review.
 
 # AI usage disclosure
 
-[AUTHOR ACTION REQUIRED: Confirm the final AI disclosure. The verified record for this revision is that OpenAI Codex (GPT-5 family; the interface did not expose the precise hosted model version) assisted with repository inspection, requirements and literature organization, test and documentation drafting, figure generation, manuscript editing, and local validation records from 30 July to 12 August 2026. Confirm any earlier generative-AI use and that the author reviewed each assisted output, edited it where necessary, ran the reported validation independently, and made the core scientific and design decisions.]
+OpenAI Codex assisted earlier repository inspection, requirements and literature organization, tests, documentation, figures and manuscript preparation in July and August 2026. The exact hosted model version for that earlier work was not retained. In September 2026, OpenAI Codex (GPT-6) assisted submission preparation, metadata alignment, research-use documentation and automated verification. The author must review and confirm the complete disclosure and all new AI-assisted outputs before submission.
 
 # Acknowledgements
 
-[AUTHOR ACTION REQUIRED: Add the verified funding and acknowledgements, or state explicitly that there was no funding or additional acknowledgement.]
+No external funding was received for this software. There was no sponsor involvement. The author declares no competing interests.
 
 # Author contributions and competing interests
 
-[AUTHOR ACTION REQUIRED: Confirm the final author list and order, whether Delun Gong is the sole and corresponding author, and provide the contribution and competing-interest statements.]
+Delun Gong is the sole and corresponding author, as confirmed on 27 September 2026.
 
 # References

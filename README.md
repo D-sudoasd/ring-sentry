@@ -215,3 +215,7 @@ support are provided on a best-effort basis.
 ## License
 
 RingSentry is released under the [MIT License](LICENSE).
+
+## JOSS preparation
+
+See the [submission guide](docs/joss/README.md) for the manuscript, verified author metadata, research-use evidence and final checks. This repository is being prepared for submission; no JOSS acceptance is claimed.

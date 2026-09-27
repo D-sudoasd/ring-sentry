@@ -64,3 +64,5 @@ desktop.ini
 
 # Claude Code / Claude Code 配置
 .claude/
+
+outputs/

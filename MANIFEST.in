@@ -39,3 +39,6 @@ exclude paper/paper.preprint*
 global-exclude *.py[cod]
 global-exclude __pycache__
 global-exclude .DS_Store
+
+recursive-include docs/joss *.md *.json
+include scripts/check_joss_artifacts.py
