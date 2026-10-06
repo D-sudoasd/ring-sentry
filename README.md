@@ -154,10 +154,17 @@ processed array after 2× binning, and these outputs:
 |---|---|
 | TIFF (`.tif`, `.tiff`) | tifffile/imageio; repository fixtures and round-trip tests exercise TIFF files |
 | MCCD, MARCCD | Routed through the TIFF-family reader by header or suffix; no dedicated MCCD/MARCCD fixture is included |
-| HDF5 and NeXus | h5py with a configurable dataset path; callers must select a single 2D dataset |
+| HDF5 and NeXus | h5py with a configurable dataset path; 2D datasets or a selected 2D frame from 3D/4D stacks (`frame_index`, and `channel` for 4D) |
 | EDF | Strict uncompressed 2D reader; project and FabIO interoperability tests exercise supported files |
 | CBF | FabIO, exercised by repository round-trip and exceptional-value tests |
 | ADSC/Bruker IMG, MAR3450, SFRM | FabIO reader routes are implemented; detector-specific sample compatibility is not yet covered by repository fixtures |
+
+The Python loader returns one 2D image at a time. For stacked HDF5/NeXus,
+`load_image(path, h5_path="entry/data/data", frame_index=0, channel=0)` selects
+the frame and, for a 4D stack, channel; both indices default to zero. Frame
+count uses finite `entry/data/start_time` values when available, otherwise the
+compact dataset shape. Unsupported ranks, out-of-range frames, and oversized
+master-style frame axes without a finite frame count are rejected.
 
 | Output | Intended use |
 |---|---|
