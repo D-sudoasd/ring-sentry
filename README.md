@@ -1,35 +1,16 @@
-<p align="center">
-  <img src="assets/readme/hero.png" width="100%" alt="RingSentry: Reproducible diffraction-image preprocessing. AI-generated conceptual illustration.">
-</p>
+# RingSentry｜衍环前哨
 
-<div align="center">
+**在积分和拟合前，检查、预处理并批量导出二维衍射探测器图像。**
 
-# RingSentry｜衍环前哨——二维衍射图预处理与质控工具
+A local desktop application and Python core for reproducible 2D diffraction-image preprocessing. It combines multi-format I/O, QC suggestions, an explicitly ordered processing pipeline, previews, and run reports for SAXS, WAXS, SXRD, and GIWAXS workflows.
 
-**Reproducible preprocessing and quality control for 2D diffraction detector images**
+[安装](#install) · [快速开始](#quick-start) · [中文入口](#中文使用入口) · [合成示例](#reproducible-headless-example) · [格式支持](#supported-data) · [文档](#documentation)
 
-SAXS · WAXS · SXRD · GIWAXS
+[![MIT](https://img.shields.io/badge/License-MIT-455A64)](LICENSE) [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-3776AB)](pyproject.toml) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19602728.svg)](https://doi.org/10.5281/zenodo.19602728)
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](pyproject.toml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19602728.svg)](https://doi.org/10.5281/zenodo.19602728)
+![可复现合成示例：128×128探测器输入及处理输出，不是实验结果或性能测试](paper/figures/synthetic_processing.png)
 
-</div>
-
-RingSentry is a local desktop application and Python processing core for
-inspectable preprocessing of two-dimensional diffraction detector images
-before downstream integration, fitting, texture analysis, or other
-quantitative interpretation. It combines multi-format input/output,
-non-mutating quality-control suggestions, an explicitly ordered numerical
-pipeline, previews, batch reports, a conservative CBF zero-value repair
-workflow, and detector-geometry/Q conversion tools.
-
-RingSentry 提供本地桌面界面与 Python 计算核心，用于积分、拟合和织构分析前的
-二维衍射图像预处理。它结合多格式读写、质量检查建议、明确的处理顺序、预览、
-批处理报告、CBF 零值修复与探测器几何工具，并将参数和处理记录随结果保存。
-
-[Install / 安装](#install) · [Quick start / 快速开始](#quick-start) ·
-[中文使用入口](#中文使用入口) · [Documentation / 文档](#documentation)
+**先看处理效果，再核对定量数组。** 示例生成合成环图，2× binning 后保存 64×64 数组，并记录选项、QC、形状和数值范围。`NPY` / `EDF` 保留定量矩阵；`PNG` 用于显示。质量建议不会自动改变参数，运行报告保存过程记录，不能代替对警告的核查。
 
 ## 中文使用入口
 
