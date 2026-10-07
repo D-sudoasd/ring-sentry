@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/readme/hero.png" width="100%" alt="RingSentry: Reproducible diffraction-image preprocessing. AI-generated conceptual illustration.">
+</p>
+
 # RingSentry｜衍环前哨
 
 **在积分和拟合前，检查、预处理并批量导出二维衍射探测器图像。**
