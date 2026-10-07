@@ -16,6 +16,18 @@ A local desktop application and Python core for reproducible 2D diffraction-imag
 
 **先看处理效果，再核对定量数组。** 示例生成合成环图，2× binning 后保存 64×64 数组，并记录选项、QC、形状和数值范围。`NPY` / `EDF` 保留定量矩阵；`PNG` 用于显示。质量建议不会自动改变参数，运行报告保存过程记录，不能代替对警告的核查。
 
+## 原理示意 / Principle schematic
+
+<p align="center">
+  <img src="assets/readme/principle.png" width="100%" alt="Quantitative detector matrices versus display rendering — conceptual schematic / 概念示意图">
+</p>
+
+*二维衍射图像经选定处理后分别保存定量矩阵和显示图像；掩膜区域保留为无效区域。概念示意，非实验图像或处理结果。*
+
+*Selected preprocessing produces a quantitative matrix and a separate display image; masked pixels remain invalid. Conceptual schematic, not experimental images or processing results.*
+
+[查看完整示意图 / View full-size schematic](assets/readme/principle.png)
+
 ## 中文使用入口
 
 1. 按下方安装步骤安装项目本身，再运行 `ringsentry`。
